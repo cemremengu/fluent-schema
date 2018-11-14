@@ -41,8 +41,8 @@ describe('FluentSchema', () => {
   })
 
   describe('keywords (any):', () => {
-    const value = 'customId'
     describe('id', () => {
+      const value = 'customId'
       it('to root', () => {
         expect(
           FluentSchema()
@@ -59,6 +59,7 @@ describe('FluentSchema', () => {
               FluentSchema()
                 .id(value)
                 .prop('bar')
+                .required()
             )
             .valueOf().properties.foo.$id
         ).toEqual(value)
@@ -137,6 +138,38 @@ describe('FluentSchema', () => {
             .examples(value)
             .valueOf().properties.prop.examples
         ).toEqual(value)
+      })
+
+      it('invalid', () => {
+        const value = 'examples'
+        expect(
+          () =>
+            FluentSchema()
+              .examples(value)
+              .valueOf().examples
+        ).toThrow("'examples' must be an array e.g. ['1', 'one', 'foo']")
+      })
+    })
+
+    describe('required', () => {
+      it('adds to root', () => {
+        expect(() => {
+          FluentSchema()
+            .asString()
+            .required()
+        }).toThrow(
+          "'required' has to be chained to a prop: \nExamples: \n- FluentSchema().prop('prop').required() \n- FluentSchema().prop('prop', FluentSchema().asNumber()).required()"
+        )
+      })
+
+      it('add to a prop', () => {
+        const prop = 'foo'
+        expect(
+          FluentSchema()
+            .prop(prop)
+            .required()
+            .valueOf().required
+        ).toEqual([prop])
       })
 
       it('invalid', () => {
